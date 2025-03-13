@@ -13,9 +13,11 @@ std::vector<std::vector<int>> ucitajGraf(){
     for(int i = 0;  i < m;i++){
         int x,y;
         std::cin>> x >> y;
+        x--;
+        y--;
         graf[x][y] = 1;
         if(usmjeren)
-            graf[x][y] = 0;
+            graf[y][x] = 1;
     }
 
     return graf;
