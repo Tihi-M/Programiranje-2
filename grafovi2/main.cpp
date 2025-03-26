@@ -167,7 +167,7 @@ bool postojiPutBfs(std::vector<std::vector<int>>& graf,int start,int kraj,std::v
     return posjecen[kraj];
 }
 
-int brojKomponentiPovezanosti(std::vector<std::vector<int>>& graf){
+int brojKomponentiPovezanostiDfs(std::vector<std::vector<int>>& graf){
     std::vector<int> posjecen(graf.size(),0);
 
     int cnt = 0;
@@ -178,6 +178,21 @@ int brojKomponentiPovezanosti(std::vector<std::vector<int>>& graf){
         }
     }
 
+    return cnt;
+}
+
+int brojKomponentiPovezanostiBfs(std::vector<std::vector<int>>& graf){
+    std::vector<int> posjecen(graf.size(),0);
+    for(int i = 0; i < graf.size();i++)
+        posjecen[i] = false;
+
+    int cnt = 0;
+    for(int i = 0; i < graf.size();i++){
+        if(posjecen[i] == 0){
+            bfs(graf, i, posjecen);
+            cnt++;
+        }
+    }
     return cnt;
 }
 
@@ -194,6 +209,6 @@ int main()
     //bool postoji = postojiPutBfs(graf,0,5,posjecen,prethodni);
     //if(postoji)
      //   stampajPutanju(0,5,prethodni);
-    std::cout<<brojKomponentiPovezanosti(graf)<<std::endl;
+    std::cout<<brojKomponentiPovezanostiBfs(graf)<<std::endl;
     return 0;
 }
