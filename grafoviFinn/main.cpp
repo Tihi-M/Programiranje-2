@@ -3,6 +3,7 @@
 #include <stack>
 #include <queue>
 
+
 std::vector<std::vector<int>> ucitajGraf(){
     int n, m;
     std::cin >> n >> m;
