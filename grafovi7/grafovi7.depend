@@ -1,0 +1,7 @@
+# depslib dependency file v1.0
+1743461859 source:c:\users\korisnik\desktop\tihi\github\programiranje-2\grafovi7\main.cpp
+	<iostream>
+	<queue>
+	<stack>
+	<vector>
+
