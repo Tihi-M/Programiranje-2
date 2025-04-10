@@ -4,72 +4,74 @@
 #include <vector>
 
 typedef std::vector<std::vector<int>> graf;
-///####################################################
-void putanjaDfs(graf& g, std::vector<int>& posjecen,std::vector<int>& prethodni, int start){
-    posjecen[start] = 1;
-    for(int i = 0; i <g.size();i++)
-        if(g[start][i] == 1 && posjecen[i] == 0){
-            prethodni[i] = start;
-            putanjaDfs(g,posjecen,prethodni,i);
-        }
-}
 
-bool postojiPutDfs(graf& g,std::vector<int>& posjecen,std::vector<int>& prethodni,int start,int kraj){
-    putanjaDfs(g,posjecen,prethodni,start);
-    return posjecen[kraj];
-}
-
-
-
-int duzinaPuta(graf& g, int start, int kraj){
-    std::vector<int> posjecen(g.size(),0);
-    std::vector<int> prethodni(g.size(),0);
-    if(postojiPutDfs(g,posjecen,prethodni,start,kraj)){
-        int cnt = 1;
-        int temp = kraj;
-        while(temp!=start){
-            temp = prethodni[temp];
-            cnt++;
-        }
-
-        return cnt;
-    }
-    else return -1;
-
-}
-
-graf ucitajGraf(int n,int m){
+graf ucitajGraf(int& n,int& m,bool usmjeren){
+    std::cin>> n >> m;
     graf g(n,std::vector<int>(n,0));
-    for(int i = 0; i < m;i++){
+
+    for(int i = 0;i < m;i++){
         int x,y;
         std::cin>>x>>y;
         g[x][y] = 1;
+        if(!usmjeren)
+            g[y][x] = 1;
     }
     return g;
 }
 
-void najbliziCvor(){
-    int n,m,cvor1,cvor2;
-    std::cin>>n>>m>>cvor1>>cvor2;
-    graf g = ucitajGraf(n,m);
-
-    int cvor3 = -1;
-    int minLen = 100000;
-    for(int i = 0; i < n;i++){
-        int d1 = duzinaPuta(g,cvor1,i);
-        std::cout<<d1<<" izmedju: "<< cvor1<< " "<<i<<std::endl;
-
-        int d2 = duzinaPuta(g,cvor2,i);
-        std::cout<<d2<<" izmedju: "<< cvor2<< " "<<i<<std::endl;
-        if(d1>0 && d2>0)
-            if(d1+d2<minLen){
-                minLen = d1+d2;
-                cvor3 = i;
-            }
+void dfsNajblizi(graf& g,int start, std::vector<int>& posjecen,std::vector<int>& duzine){
+    posjecen[start] =1;
+    for(int i = 0;i < g.size();i++)
+        if(g[start][i] == 1 && posjecen[i] == 0){
+            duzine[i] = duzine[start]+1;
+            dfsNajblizi(g,i,posjecen,duzine);
     }
-    std::cout<<cvor3;
 }
-///###############################################
+
+void bfsNajblizi(graf& g,int start,std::vector<int>& duzine){
+    std::queue<int> red;
+    red.push(start);
+    std::vector<int> posjecen(g.size(),0);
+    duzine[start] = 0;
+    posjecen[start] = 1;
+    while(!red.empty()){
+        int temp = red.front();
+        red.pop();
+
+        for(int i = 0;i < g.size();i++){
+            if(g[temp][i] == 1 && posjecen[i] == 0){
+                red.push(i);
+                posjecen[i] = 1;
+                duzine[i] = duzine[temp]+1;
+            }
+        }
+    }
+}
+
+void najblizi(){
+    int n,m,cvor1,cvor2;
+    std::cin>>cvor1>>cvor2;
+    graf g = ucitajGraf(n,m,true);
+
+    std::vector<int> duzine1(n,-1);
+    std::vector<int> duzine2(n,-1);
+
+    bfsNajblizi(g,cvor1,duzine1);
+    bfsNajblizi(g,cvor2,duzine2);
+
+    int minLen = 100000;
+    int najbliziC = -1;
+    for(int i = 0; i<n;++i){
+        if(duzine1[i] != -1 && duzine2[i] != -1 && duzine1[i] != 0 && duzine2[i] != 0){
+            int temp = std::max(duzine1[i],duzine2[i]);
+            if(temp < minLen){
+                najbliziC = i;
+                minLen = temp;
+            }
+        }
+    }
+    std::cout<<najbliziC<<std::endl;
+}
 
 bool postojiPut(graf& g,int start,int kraj){
     if(g[start][kraj] == 1)
