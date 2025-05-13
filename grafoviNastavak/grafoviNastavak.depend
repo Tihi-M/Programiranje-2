@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1747041797 source:c:\users\korisnik\desktop\tihi\github\programiranje-2\grafovinastavak\main.cpp
+	<iostream>
+	<stack>
+	<vector>
+	<queue>
+	<limits.h>
+
