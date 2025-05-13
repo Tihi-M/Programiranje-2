@@ -131,19 +131,19 @@ int podniz3_din_tab(int* arr,int len,int s){
     int dp[len+1][s+1];
     ///dp[i][j] - minimalni broj elemenata potrebnih da se
     ///             dobije suma j, od prvih i elemenata niza
-    for(int i = 0;i <= n;++i)
+    for(int i = 0;i <= len;++i)
         dp[i][0] = 0;/// nula elemenata je potrebno da se napravi suma = 0
 
     for(int j = 1;j <= s;++j)
         dp[0][j] = INT_MAX; /// suma bez elemenata?
 
-    for(int i = 1;i <= n;++i){ /// prolazimo kroz niz
+    for(int i = 1;i <= len;++i){ /// prolazimo kroz niz
         for(int j = 1;j <= s;++j){/// prolazimo kroz sve sume od 1 do s
             int with = INT_MAX; /// pocetna duzina- zato je temp intMax
             if(arr[i-1] <= j){ /// dp ide za jedan napred u indeksima,
                                 /// zato je indeks trenutnog u nizu za 1 manji
                                 /// trenutni clan ne smije biti veci od sume j
-                with = dp[i-1][j-arr[i-1]; /// od j sume uklanjamo arr[i-1] element
+                with = dp[i-1][j-arr[i-1]]; /// od j sume uklanjamo arr[i-1] element
                                         /// sada je with broj elemenata potreban za tu sumu
                 if(with < INT_MAX)
                     ++with;
@@ -201,7 +201,7 @@ int levenshtein_distance_tab(const std::string& a,const std::string& b){
         operacije[i][0]= 1;///brisanje do praznog drugog
     }
 
-    for(int j = 0;i <= n;j++){
+    for(int j = 0;j <= n;j++){
         dp[0][j] = j;
         operacije[0][j]= 2;///umetanje do punog prvog
     }
@@ -267,7 +267,7 @@ int levenshtein_distance_tab(const std::string& a,const std::string& b){
 
 */
 
-int igraNovcica(int n,k,int l,int igrac){
+int igraNovcica(int n,int k,int l,int igrac){
     if(n == 0) /// uzeti su svi novcici
         return 1-igrac; /// pobjednik je prethodni igrac
 
@@ -281,28 +281,30 @@ int igraNovcica(int n,k,int l,int igrac){
     if(l <= n)
         potez3 = igraNovcica(n-l,k,l,1-igrac);
 
+    /// uslov za pobjedu
     if(potez1 == igrac || potez2 == igrac || potez3 == igrac)
         return igrac;
     return 1-igrac;
 }
 
 int igraNovcicaDin(int n,int k,int l){
-    int dp[n+1][2];
-    dp[0][0] = 1;
-    dp[0][1] = 0;
+    int dp[n+1][2];/// dp[i][j] - ko pobjedjuje sa preostalih i novcica, ako je j na redu
+    dp[0][0] = 1; /// ako je 0 novca, a 0 na redu onda je 1 pobjednik
+    dp[0][1] = 0;/// ako je 0 novca, a 1 na redu onda je 0 pobjednik
 
-    for(int i = 1;i <= n;i++){
-        for(int j = 0;j <= 1;j++){
-            int potez1 = dp[i-1][1-j];
-            int potez2 = 1-i;
-            int potez3 = 1-j;
+    for(int i = 1;i <= n;i++){ /// prolazimo kroz sve brojeve novcica
+        for(int j = 0;j <= 1;j++){ /// za oba igraca
+            int potez1 = dp[i-1][1-j]; /// uzima se jedan novcic
+            int potez2 = 1-i; /// pretpostavljamo da ne mozemo da uzmemo k ili l-
+            int potez3 = 1-j; /// -novcica, potezi2,3 su postavljeni na pobjedu protivnika
 
-            if(k <= i)
+            if(k <= i)/// ako se moze uzeti k novcica
                 potez2 = dp[i-k][1-j];
-            if(l <= i)
+            if(l <= i) /// ako se moze uzeti l novica
                 potez3 = dp[i-l][1-j];
-
-            if(potez==j || potez2 == j || potez3 == j)
+            ///ako i jedan potez gubitnicki za protivnika
+            /// tada je trenutni pobjednik
+            if(potez1 == j || potez2 == j || potez3 == j)
                 dp[i][j] = j;
             else
                 dp[i][j] = 1-j;
@@ -311,87 +313,111 @@ int igraNovcicaDin(int n,int k,int l){
     return dp[n][0];
 }
 
-int knapsack_unb(int* v,int* z,int n,int q){
-    if(q == 0)
+/// svaki predmet ima svoju vrijednost i masu
+/// mozemo uzeti vise kopija istog predmeta
+/// zelimo da napunimo ranac tako da je njegova
+/// vrijednost sto veca
+int knapsackUnb(int* values,int* weights,int itemCnt,int capacity){
+    if(capacity == 0) /// napunili smo ranac, base case
         return 0;
 
-    int best = 0;
+    int maxValue = 0;
 
-    for(int i =0;i < n;i++){
-        int val = 0;
-        if(z[i] <= q)
-            val = knapsack_unb(v,z,n,q-z[i])+v[i];
-        if(val > best)
-            best = val;
+    for(int i =0;i < itemCnt;i++){ /// prolazimo kroz svaki predmet
+                                /// i racunamo koja je najbolja vrijednost
+                                /// koju imamo nakon uzimanja tog predmeta
+        int currVal = 0; /// trenutna vr
+        if(weights[i] <= capacity)/// ako mozemo da uzmemo predmet
+            currVal = knapsackUnb(values,weights,itemCnt,capacity-weights[i])+values[i];/// dodajemo njegovu vrijednost i ostale moguce vrijednosti
+        if(currVal > maxValue) /// ako je trenutna veca od maksimalne
+            maxValue = val;
     }
-    return best;
+    return maxValue; /// res
 }
 
-int knapsack01(int* v,int* z,int n,int q){
-    if(q == 0)
+/// isto kao prethodni sem sto se jedan predmet jednom uzima
+
+int knapsack01(int* values,int* weights,int item_cnt,int capacity){
+    if(capacity == 0) /// ako smo napunili ranac
         return 0;
-    if(n == 0)
+    if(item_cnt == 0) /// ako smo stavili sve predmete
         return 0;
 
-    int with = 0;
-    if(z[n-1] <= q)
-        with = knapsack01(v,z,n-1,q-z[n-1]+v[n-1]);
+    int with_item = 0;   /// staljamo trenutni predmet
+    if(weights[item_cnt-1] <= capacity) /// ako moze
+        with_item = knapsack01(values,
+                               weights,
+                               item_cnt-1,
+                               capacity-values[item_cnt-1])
+                               + values[item_cnt-1]; /// dodajemo njegovu vrijednost
 
-    int without = knapsack01(v,z,n-1,q);
+    int without_item = knapsack01(values,weights,item_cnt-1,capacity);/// racunamo bez trenutnog
 
-    return  with > without ? with:without;
+    return  with_item > without_item ? with_item:without_item; /// vracemo vecu vrijednost od dvoje
 }
 
-int knapsack_unb_din(int* v,int* z,int n,int q){
+/// moguce uzimati vise istih predmeta, din verzija
 
-    int dp[q+1];
-    int predmeti[q+1];
+int knapsack_unb_din(int* values,int* weights,int item_cnt,int capacity){
 
-    dp[0]=0;
-    predemti[0] = -1;
+    int dp[q+1]; ///dp[i] - maximalna vrijednost sa kapacitetom i
+    int predmeti[q+1]; /// predmeti[i] - koji predmet je uzet da se dodje do dp[i]
 
-    for(int i =1;i <= q;i++){
-        dp[i] = 0;
-        for(int j = 0;j< n;j++){
-            if(z[j] <= i){
-                if(dp[i] < dp[i-z[j]]+v[j])
+    dp[0]=0; /// ako nema predmeta nema vrijednosti
+    predmeti[0] = -1; /// na pocetku nije uzet predmet
+
+    for(int i =1;i <= capacity;i++){ /// prolazimo kroz sve moguce tezine
+        dp[i] = 0; /// na pocetku je vr = 0
+        predmeti[i] = -1 /// jos nije uzet predmet
+
+        for(int j = 0;j< item_cnt;j++){ /// prolazimo kroz sve predmete koje mozemo da uzmemo
+            if(weights[j] <= i){ /// ako mozemo da uzmemo predmet
+                /// ako uzemmo predmet j, ostaje nam dp[i - tezina[j]] vrijednosti
+                int moguca_vr = dp[i-weights[j]]+values[j];
+                if(moguca_vr > dp[i])
                 {
-                    dp[i] = dp[i-z[j]]+v[j];
+                    dp[i] = moguca_vr;
                     predmeti[i]=j;
                 }
             }
         }
     }
-    int i = q;
+
+    /// stampanje rjesenja
+
+    int i = capacity;
     while(predmeti[i] != -1){
         std::cout<<predmeti[i] << " ";
-        i = i - z[predmeti[i]];
+        i = i - weights[predmeti[i]];
     }
 
-    return dp[q];
+    return dp[capacity];
 }
 
-int knapsack01_din(int* v,int* z,int n,int q){
-    int dp[q+1][n+1]
+int knapsack01_din(int* values,int* weights,int item_cnt,int capacity){
+    int dp[q+1][n+1];///dp[i][j] = maximalna vr sa kapacitetom i
+                        /// i uzetih prvih j predmeta
 
-    for(int i =0;i <= q;i++)
-        dp[i][0] = 0;
+    for(int i =0;i <= capacity;i++)
+        dp[i][0] = 0; /// sa 0 uzetih predemta vrijednost je 0
 
-    for(int j = 0;j <= n;++j)
-        dp[0][j] = 0;
+    for(int j = 0;j <= item_cnt;++j)
+        dp[0][j] = 0;/// sa kapacitetom 0 vrijednost je 0 za bilo koji br predmeta
 
-    for(int i = 1; i <= q;i++)
+    for(int i = 1; i <= capacity;i++) /// prolazak kroz kapacitet
     {
-        for(int j = 1;j <= n;j++)
+        for(int j = 1;j <= item_cnt;j++)/// i broj predmeta
         {
-            dp[i][j]=dp[i][j-1];
+            dp[i][j]=dp[i][j-1]; ///ne uzimamo j-1 predmet
 
-            if(z[j-1] <= i)
-                dp[i][j] = std::max(dp[i-z[j-1]][j-1]+v[j-1],dp[i][j]);
+            if(weights[j-1] <= i){/// ako moze da se uzem j-1 predmet
+                ///dp[i][j] ce biti maks izmedju opcije gdje uzimamo i ne uzimamo j-1 predmet
+                dp[i][j] = std::max(dp[i-weights[j-1]][j-1]+values[j-1],dp[i][j]);
+            }
         }
 
     }
-    return dp[q][n];
+    return dp[capacity][item_cnt]; /// res
 }
 
 int igraPogadjanja(int a,int b){
@@ -408,7 +434,7 @@ int igraPogadjanja(int a,int b){
 
 int main()
 {
-
+/*
     int arr[] = {2, 3, 5, 6, 8};
     int len = 5;
     int s = 10;
@@ -426,7 +452,7 @@ int main()
     else{
         std::cout<<"Nije pronadjeno rjesenje"<<std::endl;
     }
-*/
+
     for (int i = 0; i < MAX; ++i)
     for (int j = 0; j < MAX; ++j)
         dp[i][j] = -1;
@@ -440,4 +466,7 @@ int main()
         std::cout<<"Nema rjesenja\n";
     }
     return 0;
+    */
+
+    std::cout<<igraNovcicaDin(10,3,4);
 }
