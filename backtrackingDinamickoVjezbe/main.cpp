@@ -174,7 +174,7 @@ int levenshtein_distance(const std::string& a,const std::string& b,int m,int n){
 
     int zamjena = 1 + levenshtein_distance(a,b,m-1,n-1);
     int brisanje = 1 + levenshtein_distance(a,b,m-1,n);
-    int umetanje = 1 + levenshtein_distance(a,b,m-1,n);
+    int umetanje = 1 + levenshtein_distance(a,b,m,n-1);
 
     return std::min(zamjena,std::min(brisanje,umetanje));
 
