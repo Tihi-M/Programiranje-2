@@ -1,0 +1,8 @@
+# depslib dependency file v1.0
+1749316718 source:c:\users\korisnik\desktop\tihi\github\programiranje-2\tezinski19\main.cpp
+	<iostream>
+	<queue>
+	<stack>
+	<vector>
+	<limits>
+
