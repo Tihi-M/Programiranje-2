@@ -37,11 +37,6 @@ std::vector<std::vector<double>> ucitaj_graf(int& k){
                 g[tacke[i].pos][tacke[j].pos] = 0;
                 g[tacke[j].pos][tacke[i].pos] = 0;
             }
-           /*else if(tacke[i].voda || tacke[j].voda){
-                g[tacke[i].pos][tacke[j].pos] = euclid(tacke[i].x,tacke[i].y,tacke[j].x,tacke[j].y);
-                g[tacke[j].pos][tacke[i].pos] = euclid(tacke[i].x,tacke[i].y,tacke[j].x,tacke[j].y);
-
-            }*/
             else{
                  g[tacke[i].pos][tacke[j].pos] = euclid(tacke[i].x,tacke[i].y,tacke[j].x,tacke[j].y);
                 g[tacke[j].pos][tacke[i].pos] = euclid(tacke[i].x,tacke[i].y,tacke[j].x,tacke[j].y);
